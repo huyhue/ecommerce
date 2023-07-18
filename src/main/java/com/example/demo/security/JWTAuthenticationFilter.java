@@ -25,42 +25,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private Logger log = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+	private Logger log = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
-    private AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
+	public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+		this.authenticationManager = authenticationManager;
+	}
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest req,
-                                                HttpServletResponse res) throws AuthenticationException {
-        try {
-            User creds = new ObjectMapper().readValue(req.getInputStream(), User.class);
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
+			throws AuthenticationException {
+		try {
+			User creds = new ObjectMapper().readValue(req.getInputStream(), User.class);
 
-            return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getUsername(),
-                            creds.getPassword(),
-                            new ArrayList<>())
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),
+					creds.getPassword(), new ArrayList<>()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest req,
-                                            HttpServletResponse res,
-                                            FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException {
-        String username = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
-        String token = JWT.create()
-                .withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .sign(HMAC512(SecurityConstants.SECRET.getBytes()));
-        res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-        log.info("[LOGIN] [Success] for user : " + username);
-    }
+	@Override
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+			Authentication auth) throws IOException, ServletException {
+		String username = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
+		String token = JWT.create().withSubject(username)
+				.withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+				.sign(HMAC512(SecurityConstants.SECRET.getBytes()));
+		res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+		log.info("login with user " + username);
+	}
 }

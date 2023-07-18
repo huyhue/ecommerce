@@ -19,94 +19,66 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserControllerTest {
-
     private UserController userController;
-
     private UserRepository userRepository = mock(UserRepository.class);
-
     private CartRepository cartRepository = mock(CartRepository.class);
-
     private BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
 
     @Before
     public void setUp(){
         userController = new UserController();
-
         TestUtils.injectObjects(userController, "userRepository", userRepository);
         TestUtils.injectObjects(userController, "cartRepository", cartRepository);
         TestUtils.injectObjects(userController, "bCryptPasswordEncoder", encoder);
     }
 
     @Test
-    public void createUserHappyPath(){
-        when(encoder.encode("testPassword")).thenReturn("thisIsHashed");
-
+    public void testAddUser(){
+        when(encoder.encode("huyhue123")).thenReturn("passhash");
         CreateUserRequest request = new CreateUserRequest();
-        request.setUsername("test");
-        request.setPassword("testPassword");
-        request.setConfirmPassword("testPassword");
-
+        request.setUsername("huyhue");
+        request.setPassword("huyhue123");
+        request.setConfirmPassword("huyhue123");
         ResponseEntity<User> response = userController.createUser(request);
-
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
         User user = response.getBody();
-
         assertNotNull(user);
-
         assertEquals(0, user.getId());
-        assertEquals("test", user.getUsername());
-        assertEquals("thisIsHashed", user.getPassword());
-
+        assertEquals("huyhue", user.getUsername());
+        assertEquals("passhash", user.getPassword());
     }
 
     @Test
-    public void verify_findById(){
-        long id = 1L;
+    public void testUserById(){
         User user = new User();
-        user.setUsername("test");
-        user.setPassword("testPassword");
-        user.setId(id);
-
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-
-        ResponseEntity<User> response = userController.findById(id);
-
+        user.setUsername("huyhue");
+        user.setPassword("huyhue123");
+        user.setId(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        ResponseEntity<User> response = userController.findById(1L);
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
-        User actualUser = response.getBody();
-
-        assertNotNull(actualUser);
-
-        assertEquals(id, actualUser.getId());
-        assertEquals("test", actualUser.getUsername());
-        assertEquals("testPassword", actualUser.getPassword());
+        User ex = response.getBody();
+        assertNotNull(ex);
+        assertEquals(1L, ex.getId());
+        assertEquals("huyhue", ex.getUsername());
+        assertEquals("huyhue123", ex.getPassword());
     }
 
     @Test
-    public void verify_findByUserName(){
-        long id = 1L;
-        User user = new User();
-        user.setUsername("test");
-        user.setPassword("testPassword");
-        user.setId(id);
-
-        when(userRepository.findByUsername("test")).thenReturn(user);
-
-        ResponseEntity<User> response = userController.findByUserName("test");
-
+    public void testUserByUsername(){
+    	User user = new User();
+        user.setUsername("huyhue");
+        user.setPassword("huyhue123");
+        when(userRepository.findByUsername("huyhue")).thenReturn(user);
+        ResponseEntity<User> response = userController.findByUserName("huyhue");
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
-        User actualUser = response.getBody();
-
-        assertNotNull(actualUser);
-
-        assertEquals(id, actualUser.getId());
-        assertEquals("test", actualUser.getUsername());
-        assertEquals("testPassword", actualUser.getPassword());
+        User ex = response.getBody();
+        assertNotNull(ex);
+        assertEquals("huyhue", ex.getUsername());
+        assertEquals("huyhue123", ex.getPassword());
     }
 
 }

@@ -14,87 +14,69 @@ import java.util.stream.IntStream;
 public class TestUtils {
 
     public static void injectObjects(Object target, String fieldName, Object toInject) {
-
         boolean wasPrivate = false;
-
         try {
             Field declaredField = target.getClass().getDeclaredField(fieldName);
             if(!declaredField.isAccessible()){
                 declaredField.setAccessible(true);
                 wasPrivate = true;
             }
-
             declaredField.set(target, toInject);
             if(wasPrivate){
                 declaredField.setAccessible(false);
             }
-
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
-
-
     }
 
-    public static User createUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("fymo");
-        user.setPassword("password");
-        user.setCart(createCart(user));
-
-        return user;
+    public static User addUser() {
+        User u = new User();
+        u.setId(1L);
+        u.setUsername("huyhue");
+        u.setPassword("huyhue123");
+        u.setCart(createCart(u));
+        return u;
     }
 
     public static Cart createCart(User user) {
         Cart cart = new Cart();
         cart.setId(1L);
-        List<Item> items = createItems();
-        cart.setItems(createItems());
+        List<Item> items = addItem();
+        cart.setItems(addItem());
         cart.setTotal(items.stream().map(item -> item.getPrice()).reduce(BigDecimal::add).get());
         cart.setUser(user);
-
         return cart;
     }
 
-    public static List<Item> createItems() {
-
+    public static List<Item> addItem() {
         List<Item> items = new ArrayList<>();
-
         for (int i = 1; i <= 2; i++) {
             items.add(createItem(i));
         }
-
         return items;
     }
 
     public static Item createItem(long id){
-        Item item = new Item();
-        item.setId(id);
-
-        item.setPrice(BigDecimal.valueOf(id * 1.2));
-
-        item.setName("Item " + item.getId());
-
-        item.setDescription("Description ");
-        return item;
+        Item i = new Item();
+        i.setId(id);
+        i.setPrice(BigDecimal.valueOf(id * 1.2));
+        i.setName("Item " + i.getId());
+        i.setDescription("ok item");
+        return i;
     }
 
-    public static List<UserOrder> createOrders(){
-        List<UserOrder> orders = new ArrayList<>();
-
+    public static List<UserOrder> addOrder(){
+        List<UserOrder> list = new ArrayList<>();
         IntStream.range(0,2).forEach(i -> {
-            UserOrder order = new UserOrder();
-            Cart cart = createCart(createUser());
-
-            order.setItems(cart.getItems());
-            order.setTotal(cart.getTotal());
-            order.setUser(createUser());
-            order.setId(Long.valueOf(i));
-
-            orders.add(order);
+            UserOrder o = new UserOrder();
+            Cart cart = createCart(addUser());
+            o.setItems(cart.getItems());
+            o.setTotal(cart.getTotal());
+            o.setUser(addUser());
+            o.setId(Long.valueOf(i));
+            list.add(o);
         });
-        return orders;
+        return list;
     }
-
 }

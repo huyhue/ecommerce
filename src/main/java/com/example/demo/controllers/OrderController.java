@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.UserOrder;
-import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.OrderRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 
@@ -31,22 +29,16 @@ public class OrderController {
 	@Autowired
 	private OrderRepository orderRepository;
 	
-	
 	@PostMapping("/submit/{username}")
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
-
-
-
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			log.error("[SUBMIT ORDER] [Fail] for user : " + username +", REASON : User not found" );
+			log.error("submit order fail with user " + username);
 			return ResponseEntity.notFound().build();
 		}
 		UserOrder order = UserOrder.createFromCart(user.getCart());
 		orderRepository.save(order);
-
-		log.info("[SUBMIT ORDER] [Success] for user : " + user.getUsername());
-
+		log.info("submit order with user " + user.getUsername());
 		return ResponseEntity.ok(order);
 	}
 	
@@ -54,13 +46,11 @@ public class OrderController {
 	public ResponseEntity<List<UserOrder>> getOrdersForUser(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			log.error("[ORDER HISTORY] [Fail] for user : " + username +", REASON : User not found" );
+			log.error("history order fail with user " + username);
 			return ResponseEntity.notFound().build();
 		}
-
 		List<UserOrder> history = orderRepository.findByUser(user);
-
-		log.info("[ORDER HISTORY] [Success] for user : " + user.getUsername());
+		log.info("history order with user " + user.getUsername());
 		return ResponseEntity.ok(history);
 	}
 }

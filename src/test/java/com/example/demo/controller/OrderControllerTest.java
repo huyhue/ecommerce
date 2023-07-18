@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderControllerTest {
-
     @InjectMocks
     private OrderController orderController;
 
@@ -34,56 +33,37 @@ public class OrderControllerTest {
 
     @Before
     public void setup(){
-        User user = createUser();
-
-        when(userRepository.findByUsername("fymo")).thenReturn(user);
-        when(orderRepository.findByUser(any())).thenReturn(createOrders());
+        User u = addUser();
+        when(userRepository.findByUsername("huyhue")).thenReturn(u);
+        when(orderRepository.findByUser(any())).thenReturn(addOrder());
     }
 
     @Test
-    public void verify_submit(){
-
-        ResponseEntity<UserOrder> response = orderController.submit("fymo");
+    public void testSubmit(){
+        ResponseEntity<UserOrder> response = orderController.submit("huyhue");
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
         UserOrder order = response.getBody();
-
-        assertEquals(createItems(), order.getItems());
-        assertEquals(createUser().getId(), order.getUser().getId());
-
-
+        assertEquals(addItem(), order.getItems());
+        assertEquals(addUser().getId(), order.getUser().getId());
         verify(orderRepository, times(1)).save(order);
-
     }
 
     @Test
-    public void verify_submitInvalid(){
-
-        ResponseEntity<UserOrder> response = orderController.submit("invalid username");
+    public void testSubmitFail(){
+        ResponseEntity<UserOrder> response = orderController.submit("asasas");
         assertNotNull(response);
         assertEquals(404, response.getStatusCodeValue());
-
         assertNull( response.getBody());
-
-        verify(userRepository, times(1)).findByUsername("invalid username");
+        verify(userRepository, times(1)).findByUsername("asasas");
     }
 
     @Test
-    public void verify_getOrdersForUser(){
-
-        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("fymo");
+    public void testOrderBYUser(){
+        ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("huyhue");
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
         List<UserOrder> orders = response.getBody();
-
-
-        assertEquals(createOrders().size(), orders.size());
-
+        assertEquals(addOrder().size(), orders.size());
     }
-
-    @Test
-    public void verify_getOrdersForUserInvalid(){}
-
 }

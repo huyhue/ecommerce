@@ -1,12 +1,19 @@
 package com.example.demo.controller;
 
-import com.example.demo.controllers.CartController;
-import com.example.demo.model.persistence.Cart;
-import com.example.demo.model.persistence.Item;
-import com.example.demo.model.persistence.repositories.CartRepository;
-import com.example.demo.model.persistence.repositories.ItemRepository;
-import com.example.demo.model.persistence.repositories.UserRepository;
-import com.example.demo.model.requests.ModifyCartRequest;
+import static com.example.demo.TestUtils.createCart;
+import static com.example.demo.TestUtils.createItem;
+import static com.example.demo.TestUtils.addUser;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,14 +22,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 
-
-import java.math.BigDecimal;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static com.example.demo.TestUtils.*;
+import com.example.demo.controllers.CartController;
+import com.example.demo.model.persistence.Cart;
+import com.example.demo.model.persistence.Item;
+import com.example.demo.model.persistence.repositories.CartRepository;
+import com.example.demo.model.persistence.repositories.ItemRepository;
+import com.example.demo.model.persistence.repositories.UserRepository;
+import com.example.demo.model.requests.ModifyCartRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CartControllerTest {
@@ -41,10 +47,8 @@ public class CartControllerTest {
 
     @Before
     public void setup(){
-
-        when(userRepository.findByUsername("fymo")).thenReturn(createUser());
+        when(userRepository.findByUsername("fymo")).thenReturn(addUser());
         when(itemRepository.findById(any())).thenReturn(Optional.of(createItem(1)));
-
     }
 
 
@@ -62,7 +66,7 @@ public class CartControllerTest {
 
         Cart actualCart = response.getBody();
 
-        Cart generatedCart = createCart(createUser());
+        Cart generatedCart = createCart(addUser());
 
         assertNotNull(actualCart);
 
@@ -82,34 +86,24 @@ public class CartControllerTest {
 
     @Test
     public void verify_removeFromCart(){
-
         ModifyCartRequest request = new ModifyCartRequest();
         request.setQuantity(1);
         request.setItemId(1);
         request.setUsername("fymo");
-
         ResponseEntity<Cart> response = cartController.removeFromcart(request);
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-
         Cart actualCart = response.getBody();
-
-        Cart generatedCart = createCart(createUser());
-
+        Cart generatedCart = createCart(addUser());
         assertNotNull(actualCart);
-
         Item item = createItem(request.getItemId());
         BigDecimal itemPrice = item.getPrice();
-
         BigDecimal expectedTotal = generatedCart.getTotal().subtract(itemPrice.multiply(BigDecimal.valueOf(request.getQuantity())));
-
         assertEquals("fymo", actualCart.getUser().getUsername());
         assertEquals(generatedCart.getItems().size() - request.getQuantity(), actualCart.getItems().size());
         assertEquals(createItem(2), actualCart.getItems().get(0));
         assertEquals(expectedTotal, actualCart.getTotal());
-
         verify(cartRepository, times(1)).save(actualCart);
-
     }
 
     @Test
@@ -128,7 +122,4 @@ public class CartControllerTest {
         assertNull(addResponse.getBody());
         verify(userRepository, times(2)).findByUsername("invalidUser");
     }
-
-
-
 }

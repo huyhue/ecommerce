@@ -29,55 +29,48 @@ public class CartController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private CartRepository cartRepository;
-	
+
 	@Autowired
 	private ItemRepository itemRepository;
-	
+
 	@PostMapping("/addToCart")
 	public ResponseEntity<Cart> addTocart(@RequestBody ModifyCartRequest request) {
 		User user = userRepository.findByUsername(request.getUsername());
-		if(user == null) {
-			log.error("[ADD TO CART] [Fail] for user : " + request.getUsername() +", REASON : User not found" );
+		if (user == null) {
+			log.error("add cart fail with user " + request.getUsername());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
-		if(!item.isPresent()) {
-			log.error("[ADD TO CART] [Fail] for item : " + request.getItemId() +", REASON : Item not found" );
+		if (!item.isPresent()) {
+			log.error("add cart fail with item " + request.getItemId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = user.getCart();
-		IntStream.range(0, request.getQuantity())
-			.forEach(i -> cart.addItem(item.get()));
+		IntStream.range(0, request.getQuantity()).forEach(i -> cart.addItem(item.get()));
 		cartRepository.save(cart);
-
-		log.info("[ADD TO CART] [Success] for user : " + user.getUsername());
-
+		log.info("add cart with" + user.getUsername());
 		return ResponseEntity.ok(cart);
 	}
-	
+
 	@PostMapping("/removeFromCart")
 	public ResponseEntity<Cart> removeFromcart(@RequestBody ModifyCartRequest request) {
 		User user = userRepository.findByUsername(request.getUsername());
-		if(user == null) {
-			log.error("[REMOVE FROM CART] [Fail] for user : " + request.getUsername() +", REASON : User not found" );
+		if (user == null) {
+			log.error("remove cart fail with user " + request.getUsername());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
-		if(!item.isPresent()) {
-			log.error("[REMOVE FROM CART] [Fail] for item : " + request.getItemId() +", REASON : Item not found" );
+		if (!item.isPresent()) {
+			log.error("remove cart fail with item " + request.getItemId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = user.getCart();
-		IntStream.range(0, request.getQuantity())
-			.forEach(i -> cart.removeItem(item.get()));
+		IntStream.range(0, request.getQuantity()).forEach(i -> cart.removeItem(item.get()));
 		cartRepository.save(cart);
-
-		log.info("[REMOVE FROM CART] [Success] for user : " + user.getUsername());
-
+		log.info("remove cart ok with " + user.getUsername());
 		return ResponseEntity.ok(cart);
 	}
-		
 }
