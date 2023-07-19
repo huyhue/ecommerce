@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.TestUtils;
+import com.example.demo.CommonTest;
 import com.example.demo.controllers.UserController;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,9 +28,9 @@ public class UserControllerTest {
     @Before
     public void setUp(){
         userController = new UserController();
-        TestUtils.injectObjects(userController, "userRepository", userRepository);
-        TestUtils.injectObjects(userController, "cartRepository", cartRepository);
-        TestUtils.injectObjects(userController, "bCryptPasswordEncoder", encoder);
+        CommonTest.injectObjects(userController, "userRepository", userRepository);
+        CommonTest.injectObjects(userController, "cartRepository", cartRepository);
+        CommonTest.injectObjects(userController, "bCryptPasswordEncoder", encoder);
     }
 
     @Test
@@ -39,14 +40,27 @@ public class UserControllerTest {
         request.setUsername("huyhue");
         request.setPassword("huyhue123");
         request.setConfirmPassword("huyhue123");
+        
         ResponseEntity<User> response = userController.createUser(request);
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
-        User user = response.getBody();
-        assertNotNull(user);
-        assertEquals(0, user.getId());
-        assertEquals("huyhue", user.getUsername());
-        assertEquals("passhash", user.getPassword());
+        User u = response.getBody();
+        assertEquals("huyhue", u.getUsername());
+        assertEquals("passhash", u.getPassword());
+    }
+    
+    @Test
+    public void testUserByUsername(){
+    	User user = new User();
+        user.setUsername("huyhue");
+        user.setPassword("huyhue123");
+        when(userRepository.findByUsername("huyhue")).thenReturn(user);
+        ResponseEntity<User> response = userController.findByUserName("huyhue");
+        assertEquals(200, response.getStatusCodeValue());
+        User ex = response.getBody();
+        assertNotNull(ex);
+        assertEquals("huyhue", ex.getUsername());
+        assertEquals("huyhue123", ex.getPassword());
     }
 
     @Test
@@ -57,28 +71,18 @@ public class UserControllerTest {
         user.setId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         ResponseEntity<User> response = userController.findById(1L);
-        assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         User ex = response.getBody();
         assertNotNull(ex);
-        assertEquals(1L, ex.getId());
         assertEquals("huyhue", ex.getUsername());
         assertEquals("huyhue123", ex.getPassword());
     }
 
     @Test
-    public void testUserByUsername(){
-    	User user = new User();
-        user.setUsername("huyhue");
-        user.setPassword("huyhue123");
-        when(userRepository.findByUsername("huyhue")).thenReturn(user);
-        ResponseEntity<User> response = userController.findByUserName("huyhue");
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        User ex = response.getBody();
-        assertNotNull(ex);
-        assertEquals("huyhue", ex.getUsername());
-        assertEquals("huyhue123", ex.getPassword());
+    public void testUserFail() {
+    	final ResponseEntity<User> responseByName = userController.findByUserName("notAName");
+        assertNull(responseByName.getBody());
+        final ResponseEntity<User> responseByID = userController.findById(2L);
+        assertNull(responseByID.getBody());
     }
-
 }

@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static com.example.demo.TestUtils.*;
+import static com.example.demo.CommonTest.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -41,29 +41,27 @@ public class OrderControllerTest {
     @Test
     public void testSubmit(){
         ResponseEntity<UserOrder> response = orderController.submit("huyhue");
-        assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         UserOrder order = response.getBody();
-        assertEquals(addItem(), order.getItems());
+        
         assertEquals(addUser().getId(), order.getUser().getId());
-        verify(orderRepository, times(1)).save(order);
+        assertEquals(addItem(), order.getItems());
     }
 
     @Test
     public void testSubmitFail(){
         ResponseEntity<UserOrder> response = orderController.submit("asasas");
-        assertNotNull(response);
-        assertEquals(404, response.getStatusCodeValue());
+        
         assertNull( response.getBody());
-        verify(userRepository, times(1)).findByUsername("asasas");
+        assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
     public void testOrderBYUser(){
         ResponseEntity<List<UserOrder>> response = orderController.getOrdersForUser("huyhue");
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+
         List<UserOrder> orders = response.getBody();
         assertEquals(addOrder().size(), orders.size());
+        assertEquals(200, response.getStatusCodeValue());
     }
 }

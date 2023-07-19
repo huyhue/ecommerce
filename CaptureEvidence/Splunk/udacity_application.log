@@ -1,0 +1,35 @@
+2023-07-18T23:29:29.610+0700 INFO create ok for user : test
+2023-07-18T23:29:50.305+0700 INFO remove cart ok with fymo
+2023-07-18T23:29:50.404+0700 INFO add cart withfymo
+2023-07-18T23:29:50.410+0700 ERROR remove cart fail with user invalidUser
+2023-07-18T23:29:50.411+0700 ERROR add cart fail with user invalidUser
+2023-07-18T23:29:50.518+0700 INFO create ok for user : test
+2023-07-18T23:29:50.533+0700 INFO Item with name item
+2023-07-18T23:29:50.545+0700 INFO Item with id 1
+2023-07-18T23:29:50.558+0700 INFO Item with id 10
+2023-07-18T23:29:50.564+0700 INFO Item with name invalid name
+2023-07-18T23:29:50.729+0700 INFO history order with user fymo
+2023-07-18T23:29:50.736+0700 INFO submit order with user fymo
+2023-07-18T23:29:50.766+0700 ERROR submit order fail with user invalid username
+2023-07-18T23:50:26.980+0700 INFO create ok for user : huyhue
+2023-07-18T23:55:53.409+0700 INFO create ok for user : huyhue
+2023-07-19T00:00:59.379+0700 INFO Item with id 10
+2023-07-19T00:00:59.461+0700 INFO Item with name asasas
+2023-07-19T00:00:59.469+0700 INFO Item with name item
+2023-07-19T00:00:59.475+0700 INFO Item with id 1
+2023-07-19T00:04:48.530+0700 ERROR history order fail with user huyhue
+2023-07-19T00:04:48.600+0700 ERROR submit order fail with user asasas
+2023-07-19T00:04:48.614+0700 ERROR submit order fail with user huyhue
+2023-07-19T00:05:20.937+0700 INFO history order with user huyhue
+2023-07-19T00:05:21.026+0700 ERROR submit order fail with user asasas
+2023-07-19T00:05:21.074+0700 INFO submit order with user huyhue
+2023-07-19T20:33:20.802+0700 INFO Starting ECommerceApplication on DESKTOP-QCOSLTK with PID 8588 (C:\Users\LAPTOP KIM ANH\Desktop\udacity\ecommerce-application\target\classes started by LAPTOP KIM ANH in C:\Users\LAPTOP KIM ANH\Desktop\udacity\ecommerce-application)
+2023-07-19T20:33:20.903+0700 INFO No active profile set, falling back to default profiles: default
+2023-07-19T20:33:56.460+0700 INFO Started ECommerceApplication in 38.94 seconds (JVM running for 47.885)
+2023-07-19T20:34:07.884+0700 ERROR submit order fail with user huyhue
+2023-07-19T20:34:17.586+0700 ERROR add cart fail with user huyhue
+2023-07-19T20:34:28.529+0700 INFO create ok for user : huyhue
+2023-07-19T20:35:00.340+0700 INFO login with user huyhue
+2023-07-19T20:35:23.146+0700 INFO add cart withhuyhue
+2023-07-19T20:35:26.865+0700 INFO submit order with user huyhue
+2023-07-19T20:35:31.091+0700 INFO history order with user huyhue

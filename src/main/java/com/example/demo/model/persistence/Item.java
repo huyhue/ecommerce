@@ -7,11 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -22,19 +19,30 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonProperty
 	private Long id;
-	
+
 	@Column(nullable = false)
 	@JsonProperty
 	private String name;
-	
+
 	@Column(nullable = false)
 	@JsonProperty
 	private BigDecimal price;
-	
+
 	@Column(nullable = false)
 	@JsonProperty
 	private String description;
-	
+
+	public Item() {
+	}
+
+	public Item(Long id, String name, BigDecimal price, String description) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.description = description;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -91,7 +99,5 @@ public class Item {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
-	
+
 }

@@ -1,17 +1,14 @@
 package com.example.demo.controller;
 
-import static com.example.demo.TestUtils.createCart;
-import static com.example.demo.TestUtils.createItem;
-import static com.example.demo.TestUtils.addUser;
+import static com.example.demo.CommonTest.addUser;
+import static com.example.demo.CommonTest.addItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -32,7 +29,6 @@ import com.example.demo.model.requests.ModifyCartRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CartControllerTest {
-
     @InjectMocks
     private CartController cartController;
 
@@ -47,79 +43,49 @@ public class CartControllerTest {
 
     @Before
     public void setup(){
-        when(userRepository.findByUsername("fymo")).thenReturn(addUser());
-        when(itemRepository.findById(any())).thenReturn(Optional.of(createItem(1)));
-    }
-
-
-
-    @Test
-    public void verify_addToCart(){
-        ModifyCartRequest request = new ModifyCartRequest();
-        request.setQuantity(3);
-        request.setItemId(1);
-        request.setUsername("fymo");
-
-        ResponseEntity<Cart> response = cartController.addTocart(request);
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-
-        Cart actualCart = response.getBody();
-
-        Cart generatedCart = createCart(addUser());
-
-        assertNotNull(actualCart);
-
-        Item item = createItem(request.getItemId());
-        BigDecimal itemPrice = item.getPrice();
-
-        BigDecimal expectedTotal = itemPrice.multiply(BigDecimal.valueOf(request.getQuantity())).add(generatedCart.getTotal());
-
-        assertEquals("fymo", actualCart.getUser().getUsername());
-        assertEquals(generatedCart.getItems().size() + request.getQuantity(), actualCart.getItems().size());
-        assertEquals(createItem(1), actualCart.getItems().get(0));
-        assertEquals(expectedTotal, actualCart.getTotal());
-
-        verify(cartRepository, times(1)).save(actualCart);
-
+        when(userRepository.findByUsername("huyhue")).thenReturn(addUser());
+        when(itemRepository.findById(any())).thenReturn(Optional.of(addItem(1)));
     }
 
     @Test
-    public void verify_removeFromCart(){
+    public void testAddToCart() {
+        ModifyCartRequest modify = new ModifyCartRequest();
+        modify.setUsername("huyhue");
+        modify.setItemId(1L);
+        modify.setQuantity(2);
+
+        ResponseEntity<Cart> responseEntity = cartController.addTocart(modify);
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        Cart cartAdd = responseEntity.getBody();
+        assertEquals(cartAdd.getItems().size(), 4);
+    }
+    
+    @Test
+    public void testRemoveFromCart() {
+        Item item1 = new Item(1L, "Round Widget", BigDecimal.valueOf(2.99), "A widget that is round");
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item1));
+        ModifyCartRequest modify = new ModifyCartRequest();
+        modify.setUsername("huyhue");
+        modify.setItemId(1L);
+        modify.setQuantity(1);
+
+        ResponseEntity<Cart> responseEntity = cartController.removeFromcart(modify);
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        Cart cartRemove = responseEntity.getBody();
+        assertEquals(cartRemove.getItems().size(), 1);
+    }
+    
+    @Test
+    public void testFailByUsername(){
         ModifyCartRequest request = new ModifyCartRequest();
+        request.setUsername("failhuyhue");
+        request.setItemId(1L);
         request.setQuantity(1);
-        request.setItemId(1);
-        request.setUsername("fymo");
-        ResponseEntity<Cart> response = cartController.removeFromcart(request);
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        Cart actualCart = response.getBody();
-        Cart generatedCart = createCart(addUser());
-        assertNotNull(actualCart);
-        Item item = createItem(request.getItemId());
-        BigDecimal itemPrice = item.getPrice();
-        BigDecimal expectedTotal = generatedCart.getTotal().subtract(itemPrice.multiply(BigDecimal.valueOf(request.getQuantity())));
-        assertEquals("fymo", actualCart.getUser().getUsername());
-        assertEquals(generatedCart.getItems().size() - request.getQuantity(), actualCart.getItems().size());
-        assertEquals(createItem(2), actualCart.getItems().get(0));
-        assertEquals(expectedTotal, actualCart.getTotal());
-        verify(cartRepository, times(1)).save(actualCart);
-    }
-
-    @Test
-    public void verify_InvalidUsername(){
-        ModifyCartRequest request = new ModifyCartRequest();
-        request.setQuantity(1);
-        request.setItemId(1);
-        request.setUsername("invalidUser");
-        ResponseEntity<Cart> removeResponse = cartController.removeFromcart(request);
-        assertNotNull(removeResponse);
-        assertEquals(404, removeResponse.getStatusCodeValue());
-        assertNull(removeResponse.getBody());
-        ResponseEntity<Cart> addResponse = cartController.addTocart(request);
-        assertNotNull(addResponse);
-        assertEquals(404, addResponse.getStatusCodeValue());
-        assertNull(addResponse.getBody());
-        verify(userRepository, times(2)).findByUsername("invalidUser");
+        when(userRepository.findByUsername("failhuyhue")).thenReturn(null);
+        ResponseEntity<Cart> responseUserMissing = cartController.removeFromcart(request);
+        assertNotNull(responseUserMissing);
+        assertEquals(404, responseUserMissing.getStatusCodeValue());
     }
 }

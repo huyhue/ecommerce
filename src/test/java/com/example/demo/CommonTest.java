@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class TestUtils {
-
+public class CommonTest {
     public static void injectObjects(Object target, String fieldName, Object toInject) {
         boolean wasPrivate = false;
         try {
@@ -35,32 +34,32 @@ public class TestUtils {
         u.setId(1L);
         u.setUsername("huyhue");
         u.setPassword("huyhue123");
-        u.setCart(createCart(u));
+        u.setCart(addCart(u));
         return u;
     }
 
-    public static Cart createCart(User user) {
-        Cart cart = new Cart();
-        cart.setId(1L);
+    public static Cart addCart(User user) {
+        Cart c = new Cart();
+        c.setId(1L);
         List<Item> items = addItem();
-        cart.setItems(addItem());
-        cart.setTotal(items.stream().map(item -> item.getPrice()).reduce(BigDecimal::add).get());
-        cart.setUser(user);
-        return cart;
+        c.setItems(addItem());
+        c.setTotal(items.stream().map(item -> item.getPrice()).reduce(BigDecimal::add).get());
+        c.setUser(user);
+        return c;
     }
 
     public static List<Item> addItem() {
-        List<Item> items = new ArrayList<>();
+        List<Item> list = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
-            items.add(createItem(i));
+        	list.add(addItem(i));
         }
-        return items;
+        return list;
     }
 
-    public static Item createItem(long id){
+    public static Item addItem(long id){
         Item i = new Item();
         i.setId(id);
-        i.setPrice(BigDecimal.valueOf(id * 1.2));
+        i.setPrice(BigDecimal.valueOf(id * 3.6));
         i.setName("Item " + i.getId());
         i.setDescription("ok item");
         return i;
@@ -70,7 +69,7 @@ public class TestUtils {
         List<UserOrder> list = new ArrayList<>();
         IntStream.range(0,2).forEach(i -> {
             UserOrder o = new UserOrder();
-            Cart cart = createCart(addUser());
+            Cart cart = addCart(addUser());
             o.setItems(cart.getItems());
             o.setTotal(cart.getTotal());
             o.setUser(addUser());
